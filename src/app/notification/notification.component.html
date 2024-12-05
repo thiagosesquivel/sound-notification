@@ -1,0 +1,8 @@
+<p-toast position="top-right"></p-toast>
+<p-panel header="Notificações">
+  <ul>
+    <li *ngFor="let notification of notifications">
+      {{ notification.message }} - {{ notification.timestamp | date: 'short' }}
+    </li>
+  </ul>
+</p-panel>
