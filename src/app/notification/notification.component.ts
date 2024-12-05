@@ -10,6 +10,7 @@ import { MessageService } from 'primeng/api';
 })
 export class NotificationComponent implements OnInit, OnDestroy {
   notifications: any[] = [];
+  isPageVisible: boolean = true; 
 
   constructor(
     private websocketService: WebsocketService,
@@ -17,14 +18,23 @@ export class NotificationComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+
+    document.addEventListener('visibilitychange', this?.checkVisibility);
+
+
     this.websocketService.listen('notification').subscribe((data: { message: string; }) => {
       this.notifications.push(data);
       this.showToast(data.message);
-      this.playSound();
+      if (!this.isPageVisible) {
+        this.playSound();
+      }
     });
+    console.log(this.isPageVisible)
   }
+  
 
   ngOnDestroy() {
+    document.removeEventListener('visibilitychange', this.checkVisibility.bind(this));
     this.websocketService.disconnect();
   }
 
@@ -32,6 +42,11 @@ export class NotificationComponent implements OnInit, OnDestroy {
     const audio = new Audio('assets/notificacao.mp3');
     audio.play();
   }
+
+  checkVisibility = () => {
+    this.isPageVisible = document.visibilityState === 'visible';
+  }
+
 
   showToast(message: string) {
     this.messageService.add({
